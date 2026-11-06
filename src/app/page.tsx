@@ -24,24 +24,33 @@ export default function Home() {
   const [activeServer, setActiveServer] = useState<1 | 2>(1);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+ useEffect(() => {
     async function fetchMatches() {
-      const { data, error } = await supabase
-        .from('matches')
-        .select('*')
-        .order('created_at', { ascending: false });
+      // ব্রাউজার ছাড়া সার্ভার বিল্ডের সময় যাতে কল না হয়
+      if (typeof window === 'undefined') return;
 
-      console.log('Supabase Data:', data);
-      if (error) {
-        console.error('Supabase Error Details:', error);
-      }
+      try {
+        const { data, error } = await supabase
+          .from('matches')
+          .select('*')
+          .order('created_at', { ascending: false });
 
-      if (!error && data) {
-        setMatches(data as Match[]);
-        if (data.length > 0) setSelectedMatch(data[0] as Match);
+        console.log('Supabase Data:', data);
+        if (error) {
+          console.error('Supabase Error Details:', error);
+        }
+
+        if (!error && data) {
+          setMatches(data as Match[]);
+          if (data.length > 0) setSelectedMatch(data[0] as Match);
+        }
+      } catch (err) {
+        console.error('Fetch error:', err);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     }
+
     fetchMatches();
   }, []);
 
