@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { supabase } from './supabase';
+import { getSupabase } from './supabase';
 import { Tv, Radio } from 'lucide-react';
 import LivePlayer from './components/LivePlayer';
 
@@ -26,10 +26,8 @@ export default function Home() {
 
  useEffect(() => {
     async function fetchMatches() {
-      // ব্রাউজার ছাড়া সার্ভার বিল্ডের সময় যাতে কল না হয়
-      if (typeof window === 'undefined') return;
-
       try {
+        const supabase = getSupabase();
         const { data, error } = await supabase
           .from('matches')
           .select('*')
@@ -50,7 +48,6 @@ export default function Home() {
         setLoading(false);
       }
     }
-
     fetchMatches();
   }, []);
 
