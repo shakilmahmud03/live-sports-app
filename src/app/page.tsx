@@ -1,9 +1,9 @@
 'use client';
 
-
-
 import { useEffect, useState } from 'react';
-
+import { supabase } from './supabase';
+import { Tv, Radio } from 'lucide-react';
+import LivePlayer from './components/LivePlayer';
 
 interface Match {
   id: string;
