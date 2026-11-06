@@ -6,6 +6,6 @@ const supabaseUrl =
 
 const supabaseAnonKey =
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-  'eyJhbGciOi...আপনার_legacy_anon_key';
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.dummy_key_to_pass_build';
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
