@@ -19,6 +19,9 @@ export default function LivePlayer({ streamUrl, streamType }: LivePlayerProps) {
         const hls = new Hls({
           enableWorker: true,
           lowLatencyMode: true,
+          xhrSetup: (xhr) => {
+            xhr.withCredentials = false;
+          },
         });
 
         hls.loadSource(streamUrl);
@@ -43,15 +46,19 @@ export default function LivePlayer({ streamUrl, streamType }: LivePlayerProps) {
         <video
           ref={videoRef}
           controls
+          autoPlay
+          muted
           playsInline
           className="h-full w-full object-contain"
         />
       ) : (
         <iframe
+          key={streamUrl}
           src={streamUrl}
           title="Live Stream Embed"
-          allow="autoplay; encrypted-media; picture-in-picture"
-          sandbox="allow-scripts allow-same-origin allow-presentation"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
+          allowFullScreen
+          referrerPolicy="no-referrer"
           className="h-full w-full border-0"
         />
       )}
