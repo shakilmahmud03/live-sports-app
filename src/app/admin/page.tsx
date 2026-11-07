@@ -1,7 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase'; // আপনার সুপাবেস ক্লায়েন্ট পাথ
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 interface Match {
   id: string | number;
@@ -34,23 +39,35 @@ export default function AdminPage() {
 
   const ADMIN_SECRET = process.env.NEXT_PUBLIC_ADMIN_SECRET || 'shakil@admin2026';
 
+  // ম্যাচ ফেচ করার ফাংশন
+  const fetchMatches = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('matches')
+      .select('*')
+      .order('id', { ascending: false });
+      
+    if (!error && data) {
+      setMatches(data);
+    }
+    setLoading(false);
+  };
+
+  // ইউজার অথেনটিকেটেড হলে স্বয়ংক্রিয়ভাবে ম্যাচ ফেচ হবে
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchMatches();
+    }
+  }, [isAuthenticated]);
+
   // লগইন হ্যান্ডলার
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (password === ADMIN_SECRET) {
       setIsAuthenticated(true);
-      fetchMatches();
     } else {
       alert('ভুল পাসওয়ার্ড!');
     }
-  };
-
-  // ম্যাচ লিস্ট আনা
-  const fetchMatches = async () => {
-    setLoading(true);
-    const { data, error } = await supabase.from('matches').select('*').order('id', { ascending: false });
-    if (!error && data) setMatches(data);
-    setLoading(false);
   };
 
   // নতুন ম্যাচ ইনসার্ট করা
@@ -168,7 +185,7 @@ export default function AdminPage() {
             placeholder="Server 1 Stream URL (.m3u8 or embed)"
             value={formData.server1_url}
             onChange={(e) => setFormData({ ...formData, server1_url: e.target.value })}
-            className="bg-slate-800 border border-slate-700 p-2.5 rounded-lg text-white md:col-span-1"
+            className="bg-slate-800 border border-slate-700 p-2.5 rounded-lg text-white"
           />
           <select
             value={formData.server1_type}
@@ -194,7 +211,7 @@ export default function AdminPage() {
             placeholder="Server 2 Stream URL"
             value={formData.server2_url}
             onChange={(e) => setFormData({ ...formData, server2_url: e.target.value })}
-            className="bg-slate-800 border border-slate-700 p-2.5 rounded-lg text-white md:col-span-1"
+            className="bg-slate-800 border border-slate-700 p-2.5 rounded-lg text-white"
           />
           <select
             value={formData.server2_type}
